@@ -61,7 +61,8 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Copy start script
+# Copy start script and init script
 COPY --from=builder /app/start.sh ./start.sh
+COPY --from=builder /app/init-db.js ./init-db.js
 
 CMD ["sh", "start.sh"]
