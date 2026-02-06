@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Channel {
+  id        String   @id @default(cuid())
+  name      String
+  youtubeId String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Restaurant {
+  id            String   @id @default(cuid())
+  name          String
+  address       String?
+  lat           Float
+  lng           Float
+  mapsUrl       String
+  videoId       String
+  videoTitle    String
+  thumbnail     String
+  channelId     String
+  channelName   String
+  channelAvatar String?
+  viewCount     Int?
+  publishedAt   DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([videoId, mapsUrl])
+  @@index([lat, lng])
+}
+
+model VisitorLog {
+  id        String   @id @default(cuid())
+  lat       Float?
+  lng       Float?
+  ip        String?
+  userAgent String?
+  device    String?
+  createdAt DateTime @default(now())
+}
+
+model ChannelSuggestion {
+  id           String    @id @default(cuid())
+  youtubeId    String    // @username or channel ID
+  channelName  String?   // resolved name (nullable until processed)
+  suggestedBy  String?   // optional: user identifier
+  reason       String?   // why they suggest this channel
+  status       String    @default("pending") // pending | approved | rejected
+  rejectReason String?   // admin's reason for rejection
+  createdAt    DateTime  @default(now())
+  processedAt  DateTime?
+}
+
+model SyncLog {
+  id              String    @id @default(cuid())
+  status          String    @default("running") // running | completed | failed
+  totalChannels   Int       @default(0)
+  currentChannel  Int       @default(0)
+  channelName     String?
+  totalVideos     Int       @default(0)
+  processedVideos Int       @default(0)
+  skippedVideos   Int       @default(0)
+  added           Int       @default(0)
+  updated         Int       @default(0)
+  errors          String?   // JSON array of error messages
+  startedAt       DateTime  @default(now())
+  completedAt     DateTime?
+}
