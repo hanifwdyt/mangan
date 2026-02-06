@@ -2,7 +2,7 @@ FROM node:20-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
@@ -28,8 +28,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Install yt-dlp and its dependencies
-RUN apk add --no-cache python3 py3-pip ffmpeg \
+# Install yt-dlp and its dependencies + openssl for Prisma
+RUN apk add --no-cache python3 py3-pip ffmpeg openssl \
     && pip3 install --break-system-packages yt-dlp
 
 RUN addgroup --system --gid 1001 nodejs
